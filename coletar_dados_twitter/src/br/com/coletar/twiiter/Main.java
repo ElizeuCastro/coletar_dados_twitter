@@ -1,19 +1,14 @@
 package br.com.coletar.twiiter;
 
-import java.util.ArrayList;
-
-import twitter4j.Twitter;
-import br.com.coletar.twitter.modelo.Tweet;
-import br.com.coletar.twitter.util.TwitterUtils;
+import br.com.coletar.twitter.util.TwitterConnection;
 
 public class Main {
 
-	public static void main(String[] args) {
-		String tweetWords = "futebol";
-		int nTweets = 25;
-		Twitter twitter = TwitterUtils.createTwitter();
-		ArrayList<Tweet> data = TwitterUtils.search(twitter, tweetWords, nTweets);
-		System.out.println(data.toString());
+	public static void main(final String[] args) {
+		final String word = "futebol";
+		final TwitterConnection twitter = new TwitterConnection();
+		twitter.connect();
+		twitter.search(word, 100);
 	}
-	
+
 }

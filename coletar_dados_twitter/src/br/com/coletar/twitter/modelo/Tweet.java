@@ -2,38 +2,65 @@ package br.com.coletar.twitter.modelo;
 
 public class Tweet {
 
-	private long id;
-	private String user;
-	private String text;
-	private String userLocation;
-	private String tweetPlace;
-	private String tweetCountry;
-	private String tweetFullName;
-	private int retweets;
-	private String date;
+	private final long tweetId;
+	private final String user;
+	private final String tweetText;
+	private final String userLocation;
+	private final String tweetPlace;
+	private final String tweetPlaceCountry;
+	private final String tweetPlaceFullName;
+	private final int retweets;
+	private final String date;
 
-	public Tweet(long id, String user, String text, String userLocation,
-			String tweetPlace, String tweetCountry, String tweetFullName,
-			int retweets, String date) {
+	public Tweet(final long tweetId, final String user, final String tweetText,
+			final String userLocation, final String tweetPlace, final String tweetPlaceCountry,
+			final String tweetPlaceFullName, final int retweets, final String date) {
 		super();
-		this.id = id;
+		this.tweetId = tweetId;
 		this.user = user;
-		this.text = text;
+		this.tweetText = tweetText;
 		this.userLocation = userLocation;
 		this.tweetPlace = tweetPlace;
-		this.tweetCountry = tweetCountry;
-		this.tweetFullName = tweetFullName;
+		this.tweetPlaceCountry = tweetPlaceCountry;
+		this.tweetPlaceFullName = tweetPlaceFullName;
 		this.retweets = retweets;
 		this.date = date;
 	}
 
-	@Override
-	public String toString() {
-		return "Tweet [id=" + id + ", user=" + user + ", text=" + text
-				+ ", userLocation=" + userLocation + ", tweetPlace="
-				+ tweetPlace + ", tweetCountry=" + tweetCountry
-				+ ", tweetFullName=" + tweetFullName + ", retweets=" + retweets
-				+ ", date=" + date + "]";
+	public long getTweetId() {
+		return tweetId;
+	}
+
+	public String getUser() {
+		return user;
+	}
+
+	public String getTweetText() {
+		return tweetText;
+	}
+
+	public String getUserLocation() {
+		return userLocation;
+	}
+
+	public String getTweetPlace() {
+		return tweetPlace;
+	}
+
+	public String getTweetPlaceCountry() {
+		return tweetPlaceCountry;
+	}
+
+	public String getTweetPlaceFullName() {
+		return tweetPlaceFullName;
+	}
+
+	public int getRetweets() {
+		return retweets;
+	}
+
+	public String getDate() {
+		return date;
 	}
 
 }

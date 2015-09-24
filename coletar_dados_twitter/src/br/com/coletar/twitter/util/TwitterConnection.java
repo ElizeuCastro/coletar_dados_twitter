@@ -1,9 +1,8 @@
 package br.com.coletar.twitter.util;
 
-import java.util.ArrayList;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-import twitter4j.Paging;
 import twitter4j.Query;
 import twitter4j.QueryResult;
 import twitter4j.Status;
@@ -11,45 +10,40 @@ import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
 import twitter4j.auth.AccessToken;
+import br.com.coletar.twiiter.banco.Persistence;
 import br.com.coletar.twitter.modelo.Tweet;
 
-public class TwitterUtils {
+public class TwitterConnection {
 
-	//private static long TIMEOUT = 10 * 60 * 1000;
-	private static long TIMEOUT = 20000;
+	private static long TIMEOUT = 10 * 60 * 1000;
 
+	private SimpleDateFormat dateFormat;
 	private static final String TOKEN = "3734520579-Fyr9UTXtZnArVoBNnqCaXQe3VBpZRrWZBbmkGlb";
 	private static final String TOKEN_SECRET = "wwOVe0cz3hJ2VzzT3TNo0kuNJ65PqCmprpR0TbnWkvwaW";
 	private static final String CONSUMER_KEY = "MzliOiM9NcyVCaNTxHd3msNYH";
 	private static final String CONSUMER_SECRET = "9lOqLGFRTWz14YgCAeUIckoEzMpi1op5S8eKA0djNjZ5ZbYCIE";
-	public static Twitter twitter = null;
-
-	public static Twitter createTwitter() {
-		if (twitter == null) {
-			twitter = TwitterFactory.getSingleton();
-			final AccessToken accessToken = new AccessToken(TOKEN, TOKEN_SECRET);
-			twitter.setOAuthConsumer(CONSUMER_KEY, CONSUMER_SECRET);
-			twitter.setOAuthAccessToken(accessToken);
-		}
-		return twitter;
+	private Twitter twitter;
+	private Persistence persistence;
+	
+	public void connect() {
+		twitter = TwitterFactory.getSingleton();
+		final AccessToken accessToken = new AccessToken(TOKEN, TOKEN_SECRET);
+		twitter.setOAuthConsumer(CONSUMER_KEY, CONSUMER_SECRET);
+		twitter.setOAuthAccessToken(accessToken);
+		persistence = new Persistence();
+		persistence.connect();
+		dateFormat = new SimpleDateFormat("dd/MM/YYYY hh:mm");
 	}
 
-	public static ArrayList<Tweet> search(final Twitter twitter,
-			final String queryString, final int tweetCount) {
-		final ArrayList<Tweet> tweets = new ArrayList<Tweet>();
-		long startTime = Calendar.getInstance().getTimeInMillis();
-
+	public void search(final String queryString, final int tweetCount) {
+		final long startTime = Calendar.getInstance().getTimeInMillis();
 		Query query = new Query(queryString);
 		query.setCount(100);
 		QueryResult result = null;
-
 		do {
 			try {
 				result = twitter.search(query);
-				result.getCount();
-				Status teste = null;
 				for (final Status status : result.getTweets()) {
-					teste = status;
 					final long id = status.getId();
 					final String user = status.getUser().getName();
 					final String text = status.getText();
@@ -69,11 +63,13 @@ public class TwitterUtils {
 						}
 					}
 					final int retweets = status.getRetweetCount();
-					final String date = status.getCreatedAt().toLocaleString();
+					final String date = dateFormat.format(status.getCreatedAt());
 					final Tweet tweet = new Tweet(id, user, text, userLocation,
 							tweetPlace, tweetCountry, tweetFullName, retweets,
 							date);
-					tweets.add(tweet);
+					
+					persistence.saveTweet(tweet);
+					
 				}
 
 				/* nova pesquisa */
@@ -82,13 +78,9 @@ public class TwitterUtils {
 				query.setSinceId(query.getMaxId());
 
 			} catch (final TwitterException e) {
-				e.printStackTrace();
+				System.out.println("error " + e);
 			}
+			System.out.println("rate limit remaining = " + result.getRateLimitStatus().getRemaining());
 		} while (Calendar.getInstance().getTimeInMillis() - startTime < TIMEOUT);
-		System.out.println("------------------ TWEET ------------------------");
-		System.out.println(tweets.toString());
-		System.out.println("Size: " + tweets.size());
-		
-		return tweets;
 	}
 }
