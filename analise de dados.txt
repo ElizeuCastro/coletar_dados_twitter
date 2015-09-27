@@ -1,20 +1,34 @@
 1 - Quantide de tweets de uma localização:
-db.tweets.find({tweet_place: "Rio de Janeiro"});
+db.tweets.find({tweet_place: {$eq: "Rio de Janeiro"}}).pretty();
 
 2 - Quantidade de tweets agrupados por localidade:
-db.tweets.group({key: {tweet_place}, cond:{}, reduce:function(curr, result){ result.count++ },initial:{count:0}});
+db.tweets.group({key: {tweet_place: {$not:""}}, cond:{}, reduce:function(curr, result){ result.count++; },initial:{count:0}});
+db.tweets.aggregate([{ $group: { _id: "$tweet_place",  count: {$sum: 1}}},{$sort: {count: -1}}]);
 
 3 - Tweet mais retweetado:
-?
+db.tweets.find({$query:{retweets: {$gt: 0}}, $orderby: {retweets: -1}}).limit(1).pretty();
+db.tweets.find().sort({retweets: -1}).limit(1).pretty();
 
-db.tweets.group({key: {tweet_text:1}, cond:{}, reduce:function(curr, result){ result.count+=curr.retweets },initial:{count:0}}).sort(count:0);
-
-4 - Lista de retweets do (< para >) e (> para <):
+4 - Lista de retweets do (menor para maior) e (maior para menor):
 db.tweets.find().sort({retweets:1}).pretty();
 db.tweets.find().sort({retweets:-1}).pretty();
 
-5 - Tweets falando sobre determinado assunto. Ex: "seleção brasileiro"
+5 - Tweets falando sobre determinado assunto. Ex: "seleção brasileira"
 db.tweets.find({tweet_text : {$regex: ".* seleção brasileira.*"}}).pretty();
 
+6 - Total de tweets
+db.tweets.find().count();
+
+7 - Twees com quantidade de retweets maior que (x) valor
+db.tweets.find({retweets :{$gt: 2000}}).pretty();
+
+8 - Lista cidades de origens dos tweets
+db.tweets.aggregate( {$group: {_id : "$tweet_place"}})
+
+9 - Lista todos usuários que postaram tweets
+db.tweets.distinct("user", {user:  {$not:{$eq:""}}}).sort({user: 1});
+
+10 - Quantide de tweets por usuários
+ db.tweets.aggregate([{ $group: { _id: "$user",  count: {$sum: 1}}},{$sort: {count: -1}}]);
 
 
